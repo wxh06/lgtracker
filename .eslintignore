@@ -1,0 +1,4 @@
+dist/
+
+!.*rc.js
+!.*rc.[mc]js
