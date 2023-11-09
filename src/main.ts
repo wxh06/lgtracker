@@ -1,5 +1,3 @@
-import "./assets/main.css";
-
 import { ViteSSG } from "vite-ssg";
 import { createPinia } from "pinia";
 

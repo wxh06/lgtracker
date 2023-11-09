@@ -48,18 +48,22 @@ function getColor(contest: ContestDetails, pid: string) {
 </script>
 
 <template>
-  <ul>
-    <li v-for="contest in contests" :key="contest.details.id">
-      {{ contest.details.name }}
-      <ol>
-        <li v-for="problem in contest.problems" :key="problem.pid">
-          <span
-            :style="{ backgroundColor: getColor(contest.details, problem.pid) }"
-            >{{ problem.pid }}</span
-          >
-          {{ problem.title }}
-        </li>
-      </ol>
-    </li>
-  </ul>
+  <main>
+    <ul>
+      <li v-for="contest in contests" :key="contest.details.id">
+        {{ contest.details.name }}
+        <ol>
+          <li v-for="problem in contest.problems" :key="problem.pid">
+            <span
+              :style="{
+                backgroundColor: getColor(contest.details, problem.pid),
+              }"
+              >{{ problem.pid }}</span
+            >
+            {{ problem.title }}
+          </li>
+        </ol>
+      </li>
+    </ul>
+  </main>
 </template>
