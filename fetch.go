@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/wxh06/luogu-cli/pkg/luogu"
@@ -88,6 +90,45 @@ func main() {
 
 	// 每场比赛的详情与题目摘要
 	var contests = make(map[int]Contest)
+
+	// 从文件中读取已保存的比赛数据
+	if f, err := os.Open("src/contests.json"); err == nil {
+		if err = json.NewDecoder(f).Decode(&contests); err != nil {
+			panic(err)
+		}
+		if err = f.Close(); err != nil {
+			panic(err)
+		}
+	}
+
+	// 从文件中读取每个保存的用户通过情况
+	entries, err := os.ReadDir("public/users")
+	if err != nil {
+		panic(err)
+	}
+	for _, entry := range entries {
+		name := entry.Name()
+		uid, err := strconv.Atoi(strings.Split(name, ".")[0])
+		if err != nil {
+			continue
+		}
+
+		f, err := os.Open("public/users/" + name)
+		if err != nil {
+			panic(err)
+		}
+
+		var passed map[int]map[string]int
+		if err = json.NewDecoder(f).Decode(&passed); err != nil {
+			panic(err)
+		}
+		users[uid] = passed
+
+		if err = f.Close(); err != nil {
+			panic(err)
+		}
+	}
+
 	for _, contest := range data.CurrentData.Contests.Result {
 		data, err := luogu.Get[luogu.DataResponse[ContestData]](fmt.Sprintf("https://www.luogu.com.cn/contest/%d", contest.Id))
 		if err != nil {
@@ -109,21 +150,27 @@ func main() {
 	}
 
 	// 储存比赛数据
-	f, err := os.Create("src/data/contests.json")
+	f, err := os.Create("src/contests.json")
 	if err != nil {
 		panic(err)
 	}
 	if err = json.NewEncoder(f).Encode(contests); err != nil {
 		panic(err)
 	}
+	if err = f.Close(); err != nil {
+		panic(err)
+	}
 
 	// 存储每个用户的通过情况
 	for user, passed := range users {
-		f, err := os.Create(fmt.Sprintf("public/users/%d.json", user))
+		f, err = os.Create(fmt.Sprintf("public/users/%d.json", user))
 		if err != nil {
 			panic(err)
 		}
 		if err = json.NewEncoder(f).Encode(passed); err != nil {
+			panic(err)
+		}
+		if err = f.Close(); err != nil {
 			panic(err)
 		}
 	}
