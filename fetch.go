@@ -25,11 +25,25 @@ func get[T any](url string) (data T, err error) {
 	return
 }
 
+// Contest 用来描述比赛的详情与题目摘要
+type Contest struct {
+	Details  json.RawMessage   `json:"details"`
+	Problems []json.RawMessage `json:"problems"`
+}
+
+// ContestData 将 luogu.ContestData 的部分字段替换为 json.RawMessage，用以原样输出 JSON
+type ContestData struct {
+	Contest         json.RawMessage `json:"contest"`
+	ContestProblems []struct {
+		Problem json.RawMessage `json:"problem"`
+	} `json:"contestProblems"`
+}
+
 // 用户赛时各题的通过情况
-var users map[int]map[string]bool = map[int]map[string]bool{}
+var users = map[int]map[int]map[string]int{}
 
 // fetchScoreboard 获取指定比赛的用户通过情况
-func fetchScoreboard(id int, ruleType int) error {
+func fetchScoreboard(id int) error {
 	logger := log.Default()
 	logger.SetPrefix(fmt.Sprintf("%d scoreboard ", id))
 
@@ -47,10 +61,11 @@ func fetchScoreboard(id int, ruleType int) error {
 			}
 
 			if users[result.User.Uid] == nil {
-				users[result.User.Uid] = map[string]bool{}
+				users[result.User.Uid] = map[int]map[string]int{}
 			}
+			users[result.User.Uid][id] = map[string]int{}
 			for problem, score := range details {
-				users[result.User.Uid][problem] = (ruleType != 2 && score.Score >= 100) || (ruleType == 2 && score.Score >= 0)
+				users[result.User.Uid][id][problem] = score.Score
 			}
 		}
 
@@ -65,16 +80,16 @@ func fetchScoreboard(id int, ruleType int) error {
 
 func main() {
 	data, err := luogu.Request[luogu.DataResponse[struct {
-		Contests luogu.List[luogu.Contest[map[string]any]] `json:"contests"`
+		Contests luogu.List[luogu.Contest] `json:"contests"`
 	}]]("GET", "https://www.luogu.com.cn/contest/list", nil)
 	if err != nil {
 		panic(err)
 	}
 
-	// 每场比赛的题目摘要
-	var problems = make(map[int][]luogu.ProblemSummary)
+	// 每场比赛的详情与题目摘要
+	var contests = make(map[int]Contest)
 	for _, contest := range data.CurrentData.Contests.Result {
-		data, err := luogu.Get[luogu.DataResponse[luogu.ContestData[map[string]any]]](fmt.Sprintf("https://www.luogu.com.cn/contest/%d", contest.Id))
+		data, err := luogu.Get[luogu.DataResponse[ContestData]](fmt.Sprintf("https://www.luogu.com.cn/contest/%d", contest.Id))
 		if err != nil {
 			panic(err)
 		}
@@ -82,17 +97,25 @@ func main() {
 			continue
 		}
 
-		problems[contest.Id] = []luogu.ProblemSummary{}
+		problems := []json.RawMessage{}
 		for _, problem := range data.CurrentData.ContestProblems {
-			problems[contest.Id] = append(problems[contest.Id], problem.Problem)
+			problems = append(problems, problem.Problem)
 		}
+		contests[contest.Id] = Contest{data.CurrentData.Contest, problems}
 
-		if err = fetchScoreboard(contest.Id, contest.RuleType); err != nil {
+		if err = fetchScoreboard(contest.Id); err != nil {
 			panic(err)
 		}
 	}
 
-	// TODO: store problem data
+	// 储存比赛数据
+	f, err := os.Create("src/data/contests.json")
+	if err != nil {
+		panic(err)
+	}
+	if err = json.NewEncoder(f).Encode(contests); err != nil {
+		panic(err)
+	}
 
 	// 存储每个用户的通过情况
 	for user, passed := range users {

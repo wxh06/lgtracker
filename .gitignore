@@ -30,3 +30,6 @@ coverage
 
 # Vite SSG
 .vite-ssg-temp/
+
+# Fetched data
+src/contests.json
