@@ -58,6 +58,9 @@ devDependencies:
   lint-staged:
     specifier: ^15.0.2
     version: 15.0.2
+  luogu-api-docs:
+    specifier: github:0f-0b/luogu-api-docs
+    version: github.com/0f-0b/luogu-api-docs/b322eec609c416c6b57ad983c283088a8d8e5d2f
   npm-run-all2:
     specifier: ^6.1.1
     version: 6.1.1
@@ -3380,4 +3383,10 @@ packages:
 
   /zhead@2.2.4:
     resolution: {integrity: sha512-8F0OI5dpWIA5IGG5NHUg9staDwz/ZPxZtvGVf01j7vHqSyZ0raHY+78atOVxRqb73AotX22uV1pXt3gYSstGag==}
+    dev: true
+
+  github.com/0f-0b/luogu-api-docs/b322eec609c416c6b57ad983c283088a8d8e5d2f:
+    resolution: {tarball: https://codeload.github.com/0f-0b/luogu-api-docs/tar.gz/b322eec609c416c6b57ad983c283088a8d8e5d2f}
+    name: luogu-api-docs
+    version: 0.0.0
     dev: true

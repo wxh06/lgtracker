@@ -15,6 +15,11 @@ const routes: RouterOptions["routes"] = [
     // which is lazy-loaded when the route is visited.
     component: () => import("../views/AboutView.vue"),
   },
+  {
+    path: "/contests",
+    name: "contests",
+    component: () => import("../views/ContestsView.vue"),
+  },
 ];
 
 export default routes;
