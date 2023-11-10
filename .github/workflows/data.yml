@@ -1,0 +1,38 @@
+---
+name: Fetch data
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Runs at 00:00 UTC.
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: stable
+
+      - run: git checkout -mB dist
+
+      - name: Fetch
+        run: go run .
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f src/contests.json public/users/
+          git commit --allow-empty -m "Fetch data"
+
+      - name: Push
+        run: git push --set-upstream origin dist
