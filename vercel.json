@@ -3,6 +3,10 @@
     {
       "source": "/user/:path",
       "destination": "https://www.luogu.com.cn/user/:path"
+    },
+    {
+      "source": "/api/user/search",
+      "destination": "https://www.luogu.com.cn/api/user/search"
     }
   ]
 }

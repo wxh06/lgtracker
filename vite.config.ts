@@ -14,6 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/user/": "https://www.luogu.com.cn",
+      "/api/user/search": "https://www.luogu.com.cn",
     },
   },
 });

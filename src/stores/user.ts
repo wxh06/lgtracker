@@ -1,6 +1,10 @@
 import { reactive, ref, watch } from "vue";
 import { defineStore } from "pinia";
-import type { DataResponse, UserData } from "luogu-api-docs/luogu-api";
+import type {
+  DataResponse,
+  UserData,
+  UserSummary,
+} from "luogu-api-docs/luogu-api";
 
 export const useUserStore = defineStore("user", () => {
   const uid = ref(
@@ -19,6 +23,7 @@ export const useUserStore = defineStore("user", () => {
   watch(
     uid,
     async (uid) => {
+      name.value = undefined;
       passed.clear();
       submitted.clear();
       if (!uid) return;
@@ -26,7 +31,7 @@ export const useUserStore = defineStore("user", () => {
       const r = await fetch(`/user/${uid}`, {
         headers: { "x-luogu-type": "content-only" },
       });
-      if (!r.ok) return;
+      if (!r.ok) throw new Error(r.statusText);
       const data: DataResponse<UserData> = await r.json();
 
       name.value = data.currentData.user.name;
@@ -41,5 +46,15 @@ export const useUserStore = defineStore("user", () => {
     { immediate: true },
   );
 
-  return { uid, name, passed, submitted };
+  async function setUserByName(username: string) {
+    const r = await fetch(`/api/user/search?keyword=${username}`);
+    if (!r.ok) throw new Error(r.statusText);
+    const {
+      users: [user],
+    }: { users: [UserSummary | null] } = await r.json();
+    if (user) uid.value = user.uid;
+    else throw Error();
+  }
+
+  return { uid, name, passed, submitted, setUserByName };
 });
