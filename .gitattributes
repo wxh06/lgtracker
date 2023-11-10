@@ -1,0 +1,2 @@
+src/contests.json filter=lfs diff=lfs merge=lfs -text
+public/users.json filter=lfs diff=lfs merge=lfs -text

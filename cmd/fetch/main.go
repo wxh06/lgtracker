@@ -2,13 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"log"
-	"os"
-	"strconv"
-	"strings"
 	"time"
 
+	"github.com/wxh06/lgtracker/internal/datafile"
 	"github.com/wxh06/luogu-cli/pkg/luogu"
 )
 
@@ -91,42 +91,12 @@ func main() {
 	// 每场比赛的详情与题目摘要
 	var contests = make(map[int]Contest)
 
-	// 从文件中读取已保存的比赛数据
-	if f, err := os.Open("src/contests.json"); err == nil {
-		if err = json.NewDecoder(f).Decode(&contests); err != nil {
-			panic(err)
-		}
-		if err = f.Close(); err != nil {
-			panic(err)
-		}
-	}
-
-	// 从文件中读取每个保存的用户通过情况
-	entries, err := os.ReadDir("public/users")
-	if err != nil {
+	// 从文件中读取先前保存过的比赛与用户通过情况数据
+	if err = datafile.Read("src/contests.json", &contests); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		panic(err)
 	}
-	for _, entry := range entries {
-		name := entry.Name()
-		uid, err := strconv.Atoi(strings.Split(name, ".")[0])
-		if err != nil {
-			continue
-		}
-
-		f, err := os.Open("public/users/" + name)
-		if err != nil {
-			panic(err)
-		}
-
-		var passed map[int]map[string]int
-		if err = json.NewDecoder(f).Decode(&passed); err != nil {
-			panic(err)
-		}
-		users[uid] = passed
-
-		if err = f.Close(); err != nil {
-			panic(err)
-		}
+	if err = datafile.Read("public/users.json", &users); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		panic(err)
 	}
 
 	for _, contest := range data.CurrentData.Contests.Result {
@@ -149,29 +119,11 @@ func main() {
 		}
 	}
 
-	// 储存比赛数据
-	f, err := os.Create("src/contests.json")
-	if err != nil {
+	// 将数据写入文件
+	if err = datafile.Write("src/contests.json", contests); err != nil {
 		panic(err)
 	}
-	if err = json.NewEncoder(f).Encode(contests); err != nil {
+	if err = datafile.Write("public/users.json", users); err != nil {
 		panic(err)
-	}
-	if err = f.Close(); err != nil {
-		panic(err)
-	}
-
-	// 存储每个用户的通过情况
-	for user, passed := range users {
-		f, err = os.Create(fmt.Sprintf("public/users/%d.json", user))
-		if err != nil {
-			panic(err)
-		}
-		if err = json.NewEncoder(f).Encode(passed); err != nil {
-			panic(err)
-		}
-		if err = f.Close(); err != nil {
-			panic(err)
-		}
 	}
 }

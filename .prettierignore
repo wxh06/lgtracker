@@ -1,5 +1,6 @@
 pnpm-lock.yaml
 
 # Fetched data
-public/users/
 src/contests.json
+public/users.json
+public/users/
