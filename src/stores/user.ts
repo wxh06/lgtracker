@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import type {
   DataResponse,
   UserData,
+  UserDetails,
   UserSummary,
 } from "luogu-api-docs/luogu-api";
 
@@ -12,7 +13,7 @@ export const useUserStore = defineStore("user", () => {
       (import.meta.env.SSR ? undefined : localStorage.getItem("user")) ?? "0",
     ) || undefined,
   );
-  const name = ref<string>();
+  const details = ref<UserDetails>();
   const passed = reactive(new Set<string>());
   const submitted = reactive(new Set<string>());
 
@@ -23,7 +24,7 @@ export const useUserStore = defineStore("user", () => {
   watch(
     uid,
     async (uid) => {
-      name.value = undefined;
+      details.value = undefined;
       passed.clear();
       submitted.clear();
       if (!uid) return;
@@ -34,7 +35,7 @@ export const useUserStore = defineStore("user", () => {
       if (!r.ok) throw new Error(r.statusText);
       const data: DataResponse<UserData> = await r.json();
 
-      name.value = data.currentData.user.name;
+      details.value = data.currentData.user;
 
       data.currentData.passedProblems?.forEach((problem) => {
         passed.add(problem.pid);
@@ -56,5 +57,5 @@ export const useUserStore = defineStore("user", () => {
     else throw Error();
   }
 
-  return { uid, name, passed, submitted, setUserByName };
+  return { uid, details, passed, submitted, setUserByName };
 });
