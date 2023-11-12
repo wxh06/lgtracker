@@ -10,13 +10,13 @@ export interface ContestWithProblems {
   problems: ProblemSummary[];
 }
 
-const { contests } = defineProps<{
+const props = defineProps<{
   contests: Record<string, ContestWithProblems>;
 }>();
 
 const keyword = ref("");
 const filteredContests = computed(() =>
-  Object.values(contests)
+  Object.values(props.contests)
     .filter(({ details: { name } }) =>
       name.toLowerCase().includes(keyword.value.toLowerCase()),
     )

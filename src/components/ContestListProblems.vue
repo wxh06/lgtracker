@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia";
 import type { Contest, ProblemSummary } from "luogu-api-docs/luogu-api";
 import { useUserStore } from "@/stores/user";
 
-const { scores } = defineProps<{
+const props = defineProps<{
   contest: Contest;
   problems: ProblemSummary[];
   scores?: Record<string, number>;
@@ -19,7 +19,7 @@ const isPassed = (score: number | undefined, ruleType: number) =>
 function getColor(contest: Contest, pid: string) {
   const PASSED = "yellowgreen";
   const SUBMITTED = "darkorange";
-  const passedDuringContest = isPassed(scores?.[pid], contest.ruleType);
+  const passedDuringContest = isPassed(props.scores?.[pid], contest.ruleType);
   if (passedDuringContest || user.passed.value.has(pid)) return PASSED;
   if (passedDuringContest === false || user.submitted.value.has(pid))
     return SUBMITTED;
