@@ -22,15 +22,35 @@ jobs:
         with:
           go-version: stable
 
-      - name: Fetch
-        run: go run ./cmd/fetch
-
-      - name: Commit
+      - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/contests.json public/users.json
-          git diff-index --quiet HEAD || git commit -m "Fetch data"
 
-      - name: Push
+      - name: Fetch data
+        run: go run ./cmd/fetch
+
+      - name: Commit fetched data
+        id: commit_fetched
+        continue-on-error: true
+        run: |
+          git add src/contests.json public/users.json
+          git commit -m "Fetch data"
+
+      - name: Push to default branch
+        if: ${{ steps.commit_fetched.outcome == 'success' }}
         run: git push
+
+      - name: Extract user data
+        if: ${{ steps.commit_fetched.outcome == 'success' }}
+        run: go run ./cmd/extract
+
+      - name: Commit extracted user
+        if: ${{ steps.commit_fetched.outcome == 'success' }}
+        run: |
+          git add -f public/users/
+          git commit -m "Extract user data"
+
+      - name: Push to dist
+        if: ${{ steps.commit_fetched.outcome == 'success' }}
+        run: git push -f origin main:dist
