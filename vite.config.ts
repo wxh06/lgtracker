@@ -17,4 +17,7 @@ export default defineConfig({
       "/api/user/search": "https://www.luogu.com.cn",
     },
   },
+  ssr: {
+    format: "cjs",
+  },
 });
