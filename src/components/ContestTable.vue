@@ -125,6 +125,7 @@ const problemIndexes = computed(() => [
             :problem="data.problems[i]"
             :problem-prefix-length="problemPrefixLength[data.details.id]"
             :rule-type="data.details.ruleType"
+            :score="scores[data.details.id]?.[data.problems[i].pid]"
           />
         </template>
       </Column>
