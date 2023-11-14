@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import contests from "@/contests.json";
-import ContestList from "@/components/ContestList.vue";
+import ContestTable from "@/components/ContestTable.vue";
 </script>
 
 <template>
-  <ContestList :contests="contests" />
+  <ContestTable :contests="Object.values(contests)" />
 </template>
