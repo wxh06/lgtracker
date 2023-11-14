@@ -6,7 +6,7 @@
 
 ## Credits
 
-本项目想法由 [5ab](https://www.luogu.com.cn/user/119491) 老师提出，参考了 [CFTraacker](https://github.com/mbashem/cftracker)。
+本项目想法由 [5ab](https://www.luogu.com.cn/user/119491) 老师提出，参考了 [CFTracker](https://github.com/mbashem/cftracker)。
 
 ## Licensing
 
