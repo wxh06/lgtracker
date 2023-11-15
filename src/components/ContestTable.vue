@@ -35,6 +35,7 @@ watch(
 );
 
 function getProblemPrefixLength(problems: ProblemSummary[]) {
+  if (problems.length <= 1) return 0;
   const titles = problems.map(({ title }) => title);
   const minLength = Math.min(...titles.map(({ length }) => length));
   for (let i = 0; i < minLength; i++)
