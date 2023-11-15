@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import Badge from "primevue/badge";
 import type { UserSummary } from "luogu-api-docs/luogu-api";
 
-defineProps<{ user?: UserSummary }>();
+defineProps<{ user: UserSummary }>();
 
-const getClassName = (color: string) =>
-  "lg-fg-" +
+const getClassName = (type: "fg" | "bg", color: string) =>
+  `lg-${type}-` +
   {
     Cheater: "brown",
     Gray: "gray",
@@ -19,11 +20,23 @@ const getClassName = (color: string) =>
 <template>
   <a
     :href="`https://www.luogu.com.cn/user/${user.uid}`"
-    :style="{ textDecoration: 'none' }"
-    v-if="user"
+    :class="getClassName('fg', user.color)"
+    style="text-decoration: none"
   >
-    <span :class="getClassName(user.color)">{{ user.name }}</span>
+    {{ user.name }}
   </a>
+  <Badge
+    v-if="user.badge"
+    :value="user.badge"
+    :class="getClassName('bg', user.color)"
+    style="margin-left: 0.25rem"
+  />
+  <!-- TODO: color -->
+  <span
+    v-if="user.ccfLevel"
+    class="pi pi-verified"
+    style="margin-left: 0.25rem"
+  />
 </template>
 
 <style>
