@@ -106,14 +106,20 @@ const problemIndexes = computed(() => [
           </span>
         </div>
       </template>
-      <Column field="details.name" header="比赛名称" style="min-width: 16rem">
+      <Column
+        field="details.name"
+        header="比赛名称"
+        style="min-width: 16rem; position: relative"
+      >
         <template #body="{ data: { details } }: { data: ContestWithProblems }">
           <a
             :href="`https://www.luogu.com.cn/contest/${details.id}`"
             target="_blank"
             rel="noreferrer"
+            class="link"
           >
             {{ details.name }}
+            <span style="position: absolute; inset: 0" />
           </a>
         </template>
       </Column>
@@ -121,7 +127,7 @@ const problemIndexes = computed(() => [
         field="details.startTime"
         header="开始时间"
         :sortable="true"
-        style="min-width: 7rem"
+        class="time"
       >
         <template #body="{ data }: { data: ContestWithProblems }">
           {{ new Date(data.details.startTime * 1000).toLocaleString("zh") }}
@@ -131,7 +137,7 @@ const problemIndexes = computed(() => [
         field="details.endTime"
         header="结束时间"
         :sortable="true"
-        style="min-width: 7rem"
+        class="time"
       >
         <template #body="{ data }: { data: ContestWithProblems }">
           {{ new Date(data.details.endTime * 1000).toLocaleString("zh") }}
@@ -142,14 +148,14 @@ const problemIndexes = computed(() => [
         :field="`problems.${i}`"
         :header="`${i + 1}`"
         :key="i"
-        style="max-width: 8rem"
+        class="problem"
       >
         <template #body="{ data }: { data: ContestWithProblems }">
           <ContestTableProblem
             v-if="data.problems[i]"
             :problem="data.problems[i]"
             :problem-prefix-length="problemPrefixLength[data.details.id]"
-            :rule-type="data.details.ruleType"
+            :contest="data.details"
             :score="scores[data.details.id]?.[data.problems[i].pid]"
           />
         </template>
@@ -157,3 +163,20 @@ const problemIndexes = computed(() => [
     </DataTable>
   </main>
 </template>
+
+<style>
+th.time {
+  white-space: nowrap;
+}
+
+td.problem {
+  max-width: 8rem;
+  padding: 0;
+  height: 0;
+}
+
+td.problem > * {
+  height: 100%;
+  padding: 0.1rem;
+}
+</style>
