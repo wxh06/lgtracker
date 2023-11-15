@@ -4,10 +4,12 @@ import { storeToRefs } from "pinia";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import InputText from "primevue/inputtext";
+import ProgressSpinner from "primevue/progressspinner";
 import { FilterMatchMode } from "primevue/api";
 import type { ContestDetails, ProblemSummary } from "luogu-api-docs/luogu-api";
 import { useUserStore } from "@/stores/user";
-import ContestTableProblem from "@/components/ContestTableProblem.vue";
+import ContestTableProblem from "./ContestTableProblem.vue";
+import UserInfo from "./UserInfo.vue";
 
 export interface ContestWithProblems {
   details: ContestDetails;
@@ -81,7 +83,7 @@ const problemIndexes = computed(() => [
       ]"
     >
       <template #header>
-        <div class="flex justify-content-end">
+        <div style="display: flex; flex-wrap: wrap-reverse">
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
             <InputText
@@ -89,9 +91,31 @@ const problemIndexes = computed(() => [
               placeholder="Keyword Search"
             />
           </span>
+          <span style="display: flex; margin-left: auto; align-items: center">
+            <UserInfo
+              v-if="user.details.value"
+              style="margin: 0.25rem 0"
+              :user="user.details.value"
+            />
+            <ProgressSpinner
+              v-else-if="user.uid.value"
+              style="height: 2rem; width: 2rem"
+              stroke-width="8"
+            />
+          </span>
         </div>
       </template>
-      <Column field="details.name" header="比赛名称" style="min-width: 16rem" />
+      <Column field="details.name" header="比赛名称" style="min-width: 16rem">
+        <template #body="{ data: { details } }: { data: ContestWithProblems }">
+          <a
+            :href="`https://www.luogu.com.cn/contest/${details.id}`"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {{ details.name }}
+          </a>
+        </template>
+      </Column>
       <Column
         field="details.startTime"
         header="开始时间"
@@ -114,7 +138,7 @@ const problemIndexes = computed(() => [
       </Column>
       <Column
         v-for="i of problemIndexes"
-        :field="`problems.${i}.pid`"
+        :field="`problems.${i}`"
         :header="`${i + 1}`"
         :key="i"
         style="max-width: 8rem"

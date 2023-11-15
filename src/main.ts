@@ -1,9 +1,9 @@
-import "primevue/resources/themes/lara-light-teal/theme.css";
-import "primeicons/primeicons.css";
+import "./assets/main.css";
 
 import { ViteSSG } from "vite-ssg";
 import { createPinia } from "pinia";
 import PrimeVue from "primevue/config";
+import Ripple from "primevue/ripple";
 import Tooltip from "primevue/tooltip";
 
 import App from "./App.vue";
@@ -18,7 +18,8 @@ export const createApp = ViteSSG(
   ({ app }) => {
     // install plugins etc.
     app.use(createPinia());
-    app.use(PrimeVue);
+    app.use(PrimeVue, { ripple: true });
     app.directive("tooltip", Tooltip);
+    app.directive("ripple", Ripple);
   },
 );

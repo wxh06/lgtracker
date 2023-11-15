@@ -1,0 +1,6 @@
+@import "primevue/resources/themes/lara-light-indigo/theme.css";
+@import "primeicons/primeicons.css";
+
+small {
+  color: var(--text-color-secondary);
+}

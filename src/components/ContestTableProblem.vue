@@ -33,16 +33,13 @@ function getColor(pid: string, ruleType: number) {
     target="_blank"
     rel="noreferrer"
   >
-    <span
-      :style="{ backgroundColor: getColor(problem.pid, ruleType) }"
-      style="color: var(--highlight-text-color)"
-      >{{ problem.pid }}</span
-    >
+    <span :style="{ backgroundColor: getColor(problem.pid, ruleType) }">
+      {{ problem.pid }}
+    </span>
   </a>
   <br />
   <small
     style="
-      color: var(--text-color-secondary);
       display: inline-block;
       overflow: hidden;
       white-space: nowrap;

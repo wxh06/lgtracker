@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-import UserInput from "@/components/UserInput.vue";
+import { RouterView } from "vue-router";
+import PageHeader from "./components/PageHeader.vue";
 </script>
 
 <template>
   <header>
-    <nav>
-      <RouterLink to="/">比赛</RouterLink>
-    </nav>
-    <UserInput />
+    <PageHeader />
   </header>
 
   <RouterView />
