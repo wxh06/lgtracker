@@ -18,13 +18,24 @@ const isPassed = (score: number | undefined, ruleType: number) =>
     : (ruleType != 2 && score >= 100) || (ruleType == 2 && score >= 0);
 
 function getColor(pid: string, ruleType: number) {
-  const PASSED = "LawnGreen";
-  const SUBMITTED = "Gold";
+  const PASSED = "#DAF7A6";
+  const SUBMITTED = "#FAFA33"; // https://htmlcolorcodes.com/colors/lemon-yellow/
   const passedDuringContest = isPassed(props.score, ruleType);
   if (passedDuringContest || user.passed.value.has(pid)) return PASSED;
   if (passedDuringContest === false || user.submitted.value.has(pid))
     return SUBMITTED;
 }
+
+const difficulties = [
+  "rgb(191, 191, 191)",
+  "rgb(254, 76, 97)",
+  "rgb(243, 156, 17)",
+  "rgb(255, 193, 22)",
+  "rgb(82, 196, 26)",
+  "rgb(52, 152, 219)",
+  "rgb(157, 61, 207)",
+  "rgb(14, 29, 105)",
+];
 </script>
 
 <template>
@@ -41,7 +52,9 @@ function getColor(pid: string, ruleType: number) {
       justify-content: space-evenly;
     "
   >
-    {{ problem.pid }}
+    <strong :style="{ color: difficulties[problem.difficulty] }">
+      {{ problem.pid }}
+    </strong>
     <small
       style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis"
       v-tooltip.bottom="problem.title"
