@@ -5,7 +5,8 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import InputText from "primevue/inputtext";
 import ProgressSpinner from "primevue/progressspinner";
-import { FilterMatchMode } from "primevue/api";
+import Calendar from "primevue/calendar";
+import { FilterMatchMode, FilterOperator } from "primevue/api";
 import type { ContestDetails, ProblemSummary } from "luogu-api-docs/luogu-api";
 import { useUserStore } from "@/stores/user";
 import ContestTableProblem from "./ContestTableProblem.vue";
@@ -55,6 +56,21 @@ const problemPrefixLength = computed(() =>
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  startTime: {
+    operator: FilterOperator.AND,
+    constraints: [
+      { value: null, matchMode: FilterMatchMode.DATE_AFTER },
+      { value: null, matchMode: FilterMatchMode.DATE_BEFORE },
+    ],
+  },
+  endTime: {
+    operator: FilterOperator.AND,
+    constraints: [
+      { value: null, matchMode: FilterMatchMode.DATE_AFTER },
+      { value: null, matchMode: FilterMatchMode.DATE_BEFORE },
+    ],
+  },
 });
 
 type ContestDecoded = Omit<ContestDetails, "startTime" | "endTime"> & {
@@ -89,9 +105,10 @@ const problemIndexes = computed(() => [
       paginator
       :rows="50"
       :rowsPerPageOptions="[20, 50, 100]"
-      v-model:filters="filters"
       sortField="startTime"
       :sortOrder="-1"
+      v-model:filters="filters"
+      filter-display="menu"
       :global-filter-fields="[
         'name',
         ...problemIndexes.map((i) => `problems.${i}.pid`),
@@ -136,6 +153,13 @@ const problemIndexes = computed(() => [
         <template #body="{ data }: { data: ContestDecoded }">
           {{ data[field].toLocaleString("zh") }}
         </template>
+        <template #filter="{ filterModel }">
+          <Calendar
+            v-model="filterModel.value"
+            dateFormat="yy/mm/dd"
+            placeholder="yyyy/mm/dd"
+          />
+        </template>
       </Column>
       <Column
         field="name"
@@ -152,6 +176,13 @@ const problemIndexes = computed(() => [
             {{ data.name }}
             <span style="position: absolute; inset: 0" />
           </a>
+        </template>
+        <template #filter="{ filterModel }">
+          <InputText
+            v-model="filterModel.value"
+            type="text"
+            placeholder="Search by name"
+          />
         </template>
       </Column>
       <Column
