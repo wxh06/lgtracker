@@ -6,7 +6,7 @@ import { useUserStore } from "@/stores/user";
 const props = defineProps<{
   problem: ProblemSummary;
   problemPrefixLength: number;
-  contest: Contest;
+  contest: Pick<Contest, "id" | "ruleType">;
   score?: number;
 }>();
 

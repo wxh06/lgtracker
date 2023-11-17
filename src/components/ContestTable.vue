@@ -57,6 +57,21 @@ const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
+type ContestDecoded = Omit<ContestDetails, "startTime" | "endTime"> & {
+  startTime: Date;
+  endTime: Date;
+  problems: ProblemSummary[];
+};
+
+const contestsDecoded = computed((): ContestDecoded[] =>
+  props.contests.map(({ details, problems }) => ({
+    ...details,
+    startTime: new Date(details.startTime * 1000),
+    endTime: new Date(details.endTime * 1000),
+    problems,
+  })),
+);
+
 const problemIndexes = computed(() => [
   ...Array(
     Math.max(...props.contests.map(({ problems }) => problems.length)),
@@ -67,18 +82,18 @@ const problemIndexes = computed(() => [
 <template>
   <main>
     <DataTable
-      :value="contests"
-      data-key="details.id"
+      :value="contestsDecoded"
+      data-key="id"
       class="p-datatable-sm"
       showGridlines
       paginator
       :rows="50"
       :rowsPerPageOptions="[20, 50, 100]"
       v-model:filters="filters"
-      sortField="details.startTime"
+      sortField="startTime"
       :sortOrder="-1"
       :global-filter-fields="[
-        'details.name',
+        'name',
         ...problemIndexes.map((i) => `problems.${i}.pid`),
         ...problemIndexes.map((i) => `problems.${i}.title`),
       ]"
@@ -107,40 +122,42 @@ const problemIndexes = computed(() => [
         </div>
       </template>
       <Column
-        field="details.name"
+        field="name"
         header="比赛名称"
         style="min-width: 16rem; position: relative"
       >
-        <template #body="{ data: { details } }: { data: ContestWithProblems }">
+        <template #body="{ data }: { data: ContestDecoded }">
           <a
-            :href="`https://www.luogu.com.cn/contest/${details.id}`"
+            :href="`https://www.luogu.com.cn/contest/${data.id}`"
             target="_blank"
             rel="noreferrer"
             class="link"
           >
-            {{ details.name }}
+            {{ data.name }}
             <span style="position: absolute; inset: 0" />
           </a>
         </template>
       </Column>
       <Column
-        field="details.startTime"
-        header="开始时间"
+        field="startTime"
+        data-type="date"
         :sortable="true"
+        header="开始时间"
         class="time"
       >
-        <template #body="{ data }: { data: ContestWithProblems }">
-          {{ new Date(data.details.startTime * 1000).toLocaleString("zh") }}
+        <template #body="{ data }: { data: ContestDecoded }">
+          {{ data.startTime.toLocaleString("zh") }}
         </template>
       </Column>
       <Column
-        field="details.endTime"
-        header="结束时间"
+        field="endTime"
+        data-type="date"
         :sortable="true"
+        header="结束时间"
         class="time"
       >
-        <template #body="{ data }: { data: ContestWithProblems }">
-          {{ new Date(data.details.endTime * 1000).toLocaleString("zh") }}
+        <template #body="{ data }: { data: ContestDecoded }">
+          {{ data.endTime.toLocaleString("zh") }}
         </template>
       </Column>
       <Column
@@ -150,13 +167,13 @@ const problemIndexes = computed(() => [
         :key="i"
         class="problem"
       >
-        <template #body="{ data }: { data: ContestWithProblems }">
+        <template #body="{ data }: { data: ContestDecoded }">
           <ContestTableProblem
             v-if="data.problems[i]"
             :problem="data.problems[i]"
-            :problem-prefix-length="problemPrefixLength[data.details.id]"
-            :contest="data.details"
-            :score="scores[data.details.id]?.[data.problems[i].pid]"
+            :problem-prefix-length="problemPrefixLength[data.id]"
+            :contest="data"
+            :score="scores[data.id]?.[data.problems[i].pid]"
           />
         </template>
       </Column>
