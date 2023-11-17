@@ -122,6 +122,22 @@ const problemIndexes = computed(() => [
         </div>
       </template>
       <Column
+        v-for="[field, header] in [
+          ['startTime', '开始时间'],
+          ['endTime', '结束时间'],
+        ] as const"
+        :field="field"
+        data-type="date"
+        :sortable="true"
+        :header="header"
+        class="time"
+        :key="field"
+      >
+        <template #body="{ data }: { data: ContestDecoded }">
+          {{ data[field].toLocaleString("zh") }}
+        </template>
+      </Column>
+      <Column
         field="name"
         header="比赛名称"
         style="min-width: 16rem; position: relative"
@@ -136,28 +152,6 @@ const problemIndexes = computed(() => [
             {{ data.name }}
             <span style="position: absolute; inset: 0" />
           </a>
-        </template>
-      </Column>
-      <Column
-        field="startTime"
-        data-type="date"
-        :sortable="true"
-        header="开始时间"
-        class="time"
-      >
-        <template #body="{ data }: { data: ContestDecoded }">
-          {{ data.startTime.toLocaleString("zh") }}
-        </template>
-      </Column>
-      <Column
-        field="endTime"
-        data-type="date"
-        :sortable="true"
-        header="结束时间"
-        class="time"
-      >
-        <template #body="{ data }: { data: ContestDecoded }">
-          {{ data.endTime.toLocaleString("zh") }}
         </template>
       </Column>
       <Column
