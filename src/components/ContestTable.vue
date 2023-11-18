@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
-import DataTable from "primevue/datatable";
+import DataTable, {
+  type DataTableOperatorFilterMetaData,
+} from "primevue/datatable";
 import Column from "primevue/column";
 import InputText from "primevue/inputtext";
 import ProgressSpinner from "primevue/progressspinner";
 import Calendar from "primevue/calendar";
+import TreeSelect from "primevue/treeselect";
+import type { TreeNode } from "primevue/tree";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
 import type { ContestDetails, ProblemSummary } from "luogu-api-docs/luogu-api";
 import { useUserStore } from "@/stores/user";
@@ -56,7 +60,7 @@ const problemPrefixLength = computed(() =>
 
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { operator: FilterOperator.OR, constraints: [] },
   startTime: {
     operator: FilterOperator.AND,
     constraints: [
@@ -93,6 +97,36 @@ const problemIndexes = computed(() => [
     Math.max(...props.contests.map(({ problems }) => problems.length)),
   ).keys(),
 ]);
+
+const nodes: TreeNode[] = [
+  {
+    key: "【LGR",
+    label: "官方比赛",
+    children: [
+      { key: "Div.1】", label: "Div.1" },
+      { key: "Div.2】", label: "Div.2" },
+      { key: "Div.3】", label: "Div.3" },
+      { key: "Div.4】", label: "Div.4" },
+    ],
+  },
+  { key: "ICPC", label: "ICPC" },
+];
+
+type TreeSelectModelValue = Record<
+  string,
+  { checked: boolean; partialChecked: boolean }
+>;
+
+const selectedCategories = ref<TreeSelectModelValue>({});
+
+function applySelectedCategories() {
+  const f: DataTableOperatorFilterMetaData["constraints"] = [];
+  Object.entries(selectedCategories.value).forEach((category) => {
+    if (category[1].checked)
+      f.push({ value: category[0], matchMode: FilterMatchMode.CONTAINS });
+  });
+  (filters.value.name as DataTableOperatorFilterMetaData).constraints = f;
+}
 </script>
 
 <template>
@@ -117,6 +151,13 @@ const problemIndexes = computed(() => [
     >
       <template #header>
         <div style="display: flex; flex-wrap: wrap-reverse">
+          <TreeSelect
+            :options="nodes"
+            v-model="selectedCategories"
+            @hide="applySelectedCategories"
+            selectionMode="checkbox"
+            placeholder="Select Item"
+          />
           <span class="p-input-icon-left">
             <i class="pi pi-search" />
             <InputText
@@ -176,13 +217,6 @@ const problemIndexes = computed(() => [
             {{ data.name }}
             <span style="position: absolute; inset: 0" />
           </a>
-        </template>
-        <template #filter="{ filterModel }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            placeholder="Search by name"
-          />
         </template>
       </Column>
       <Column
