@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 import Menubar from "primevue/menubar";
+import type { MenuItem } from "primevue/menuitem";
 import UserInput from "./UserInput.vue";
 
-const items = [
+const items: MenuItem[] = [
   {
     label: "比赛",
     icon: "pi pi-chart-bar",
     route: "/",
+  },
+  {
+    label: "GitHub",
+    icon: "pi pi-github",
+    url: "https://github.com/wxh06/lgtracker",
   },
 ];
 </script>
