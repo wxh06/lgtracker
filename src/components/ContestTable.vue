@@ -222,7 +222,7 @@ function applySelectedCategories() {
       <Column
         v-for="i of problemIndexes"
         :field="`problems.${i}`"
-        :header="`${i + 1}`"
+        :header="String.fromCharCode(i + 65)"
         :key="i"
         class="problem"
       >
@@ -243,6 +243,10 @@ function applySelectedCategories() {
 <style>
 th.time {
   white-space: nowrap;
+}
+
+.problem .p-column-title {
+  margin: auto;
 }
 
 td.problem {
