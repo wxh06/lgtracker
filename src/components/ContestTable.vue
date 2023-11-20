@@ -8,6 +8,7 @@ import Column from "primevue/column";
 import InputText from "primevue/inputtext";
 import ProgressSpinner from "primevue/progressspinner";
 import Calendar from "primevue/calendar";
+import TriStateCheckbox from "primevue/tristatecheckbox";
 import TreeSelect from "primevue/treeselect";
 import type { TreeNode } from "primevue/tree";
 import { FilterMatchMode, FilterOperator } from "primevue/api";
@@ -61,6 +62,7 @@ const problemPrefixLength = computed(() =>
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { operator: FilterOperator.OR, constraints: [] },
+  rated: { value: null, matchMode: FilterMatchMode.EQUALS },
   startTime: {
     operator: FilterOperator.AND,
     constraints: [
@@ -199,6 +201,21 @@ function applySelectedCategories() {
             v-model="filterModel.value"
             dateFormat="yy/mm/dd"
             placeholder="yyyy/mm/dd"
+          />
+        </template>
+      </Column>
+      <Column field="rated" header="Rated" data-type="boolean">
+        <template #body="{ data }">
+          <span
+            class="pi"
+            :class="data.rated ? 'pi-check-circle' : 'pi-times-circle'"
+          />
+        </template>
+        <template #filter="{ filterModel }">
+          <label for="rated-filter" class="font-bold">Rated </label>
+          <TriStateCheckbox
+            v-model="filterModel.value"
+            input-id="rated-filter"
           />
         </template>
       </Column>
